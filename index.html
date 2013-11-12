@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<form name="p2pform">
+	<input type="button" onclick="p2pcreate();" value="Create">
+	<textarea rows="10" cols="25" name="offer">ABC</textarea>
+	<input type="button" onclick="p2pjoin();" value="Join">
+	<textarea rows="10" cols="25" name="join"></textarea>
+	<input type="button" onclick="p2panswer();" value="Answer">
+	<textarea rows="10" cols="25" name="answer"></textarea>
+	<textarea rows="10" cols="25" name="dataReceive">Receive</textarea>
+	<textarea rows="10" cols="25" name="dataSend">Send</textarea>
+
+	<input type="button" onclick="p2psend();" value="Send">
+	<input type="button" onclick="p2prsend();" value="RSend">
+	<input type="button" onclick="p2pclose();" value="Close">
+	
+
+</form>
+<video id="vid1" autoplay="true" muted="true"></video>
+<video id="vid2" autoplay></video>
+
+<script src="http://localhost/ajax/libs/webrtc-adapter/js/adapter.js"></script>
+<script src="http://localhost/ajax/libs/jquery/js/jquery-1.9.0.min.js"></script>
+<script src="http://localhost/ajax/libs/json2/js/json2.js"></script>
+<script src="js/webrtc-p2p.js"></script>
+<script>
+
+// this section start user procedure
+var localpc=new p2p({audio:false, video:true}, vid1, vid2);
+var remotepc=new p2p({audio:false, video:true}, vid1, vid2);
+
+// this section contains user event 
+// f1
+function p2pcreate(){
+	localpc.create(function(offer){
+		document.p2pform.offer.value=offer;
+	});
+};
+// f2
+function p2pjoin(){
+	if (document.p2pform.join.value==""){
+		alert("Please paste the offer token here.");
+		return;
+	};
+	var token=$.parseJSON(document.p2pform.join.value);
+	remotepc.join(token, function(answer){
+		document.p2pform.answer.value=answer;
+	});
+};
+// f3
+function p2panswer(){
+	if (document.p2pform.answer.value==""){
+		alert("Please paste the answer token here.");
+		return;
+	};
+	var token=$.parseJSON(document.p2pform.answer.value);
+	localpc.answer(token);
+};
+// f4
+function p2psend(){
+	var data=document.p2pform.dataSend.value;
+	localpc.send(data);
+};
+// f4.1
+function p2prsend(){
+	var data=document.p2pform.dataReceive.value;
+	remotepc.send(data);
+};
+
+// f5
+function p2pclose(){
+	localpc.close();
+	remotepc.close();
+};
+// end section
+	
+</script>
+</body>
+</html>
